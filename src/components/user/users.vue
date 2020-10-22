@@ -9,17 +9,18 @@
 
         <!-- 卡片视图 -->
         <el-card>
-            <div slot="header"></div>
-            <el-row :gutter="10">
-                <el-col :span="8">
-                    <el-input v-model="queryInfo.query" clearable placeholder="请输入内容" @clear="getUserList" @change="getUserList">
-                        <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
-                    </el-input>
-                </el-col>
-                <el-col :span="4">
-                    <el-button type="primary" @click="dialogVisible = true">添加用户</el-button>
-                </el-col>
-            </el-row>
+            <div slot="header">
+                <el-row :gutter="10">
+                    <el-col :span="8">
+                        <el-input v-model="queryInfo.query" clearable placeholder="请输入内容" @clear="getUserList" @change="getUserList">
+                            <el-button slot="append" icon="el-icon-search" @click="getUserList"></el-button>
+                        </el-input>
+                    </el-col>
+                    <el-col :span="4">
+                        <el-button type="primary" @click="dialogVisible = true">添加用户</el-button>
+                    </el-col>
+                </el-row>
+            </div>
             <!-- 表格区域 -->
             <el-table :data="userList" style="width: 100%" border stripe>
                 <el-table-column type="index"></el-table-column>
@@ -43,7 +44,7 @@
                         <el-button circle size="mini" type="danger" icon="el-icon-delete" @click="openDelConfirm(scope.row.id)"></el-button>
                         <!-- 分配角色 -->
                         <el-tooltip effect="dark" content="分配角色" placement="top">
-                            <el-button circle size="mini" type="warning" icon="el-icon-setting"></el-button>
+                            <el-button circle size="mini" type="warning" icon="el-icon-setting" @click="oepnRoleDialog(scope.row)"></el-button>
                         </el-tooltip>
                     </template>
                 </el-table-column>
@@ -106,7 +107,32 @@
                 <!-- 底部区域 -->
                 <div slot="footer">
                     <el-button @click="modifyDialogVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="modifyUser()">确 定</el-button>
+                    <el-button type="primary" @click="modifyUser">确 定</el-button>
+                </div>
+            </el-dialog>
+
+            <!-- 分配角色对话框 -->
+            <el-dialog title="分配角色"
+                :close-on-click-modal="false"
+                :visible.sync="allotRoledialogVisible"
+                width="50%">
+                <div>
+                    <p>当前用户：{{curUserInfo.username}}</p>
+                    <p>当前角色：{{curUserInfo.role_name}}</p>
+                    <div><span>分配角色：</span>
+                        <el-select v-model="selectedRoleId" placeholder="请选择角色">
+                            <el-option
+                                v-for="item in roleList"
+                                :key="item.id"
+                                :label="item.roleName"
+                                :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </div>
+                </div>
+                <div slot="footer">
+                    <el-button @click="allotRoledialogVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="allotRole">确 定</el-button>
                 </div>
             </el-dialog>
         </el-card>
@@ -139,7 +165,6 @@ export default{
 
         }
 
-
         return{
             // 获取用户列表的参数对象
             queryInfo:{
@@ -155,6 +180,8 @@ export default{
             dialogVisible: false,
             // 修改用户对话框显示控制
             modifyDialogVisible: false,
+            // 分配角色对话框控制
+            allotRoledialogVisible: false,
             // 添加用户
             addForm:{
                 username: '',
@@ -168,6 +195,12 @@ export default{
                 email: '',
                 password: ''
             },
+            // 当前用户
+            curUserInfo:{},
+            // 角色列表
+            roleList:{},
+            // 下拉框选中的角色id
+            selectedRoleId: '',
             // 添加用户表单的校验规则
             addFormRules:{
                 username:[
@@ -313,6 +346,41 @@ export default{
                 this.$message.info('已取消删除')
             })
         },
+
+        // 打开分配角色对话框
+        async oepnRoleDialog(userInfo){
+            // 赋值当前用户的信息出去
+            this.curUserInfo = userInfo
+            // 打开对话框
+            this.allotRoledialogVisible = true
+
+            const {data: res} = await this.$http.get('roles')
+            if(res.meta.status !==200){
+                return this.$message.error('角色列表获取失败！')
+            }
+            this.roleList = res.data
+        },
+        // 分配角色
+        async allotRole(){
+            if(!this.selectedRoleId){
+                return this.$message.error('请选择要分配的角色')
+            }
+            const {data: res} = await this.$http.put(`users/${this.curUserInfo.id}/role`,{
+                rid: this.selectedRoleId
+            })
+            if(res.meta.status !==200){
+                return this.$message.error('角色分配失败！')
+            }
+            this.$message.success('角色分配成功！')
+            this.getUserList()
+            this.allotRoledialogVisible = false
+            // 重置临时数据
+            this.selectedRoleId = ''
+            this.curUserInfo = {}
+
+        }
+        
+
 
 
     }
