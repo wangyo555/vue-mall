@@ -10,6 +10,9 @@ import 'element-ui/lib/theme-chalk/index.css'
 
 // 导入全局样式表
 import './assets/css/global.css'
+// 导入vue-table-with-tree-grid插件
+import TreeTable from 'vue-table-with-tree-grid'
+
 
 Vue.config.productionTip = false
 
@@ -25,6 +28,8 @@ Vue.prototype.$http = axios
 
 // 让vue引用Element ui
 Vue.use(ElementUI)
+
+Vue.component('tree-table', TreeTable)
 
 
 new Vue({

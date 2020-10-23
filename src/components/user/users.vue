@@ -205,11 +205,11 @@ export default{
             addFormRules:{
                 username:[
                     {required: true, message:'请输入用户名', trigger: 'blur'},
-                    {require: true, min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+                    {min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
                 ],
                 password:[
                     {required: true, message:'请输入密码', trigger: 'blur'},
-                    {require: true, min: 6, max: 10, message: '长度在 3 到 15 个字符', trigger: 'blur' }
+                    {min: 6, max: 10, message: '长度在 3 到 15 个字符', trigger: 'blur' }
                 ],
                 email:[
                     {required: true, message:'请输入邮箱', trigger: 'blur'},
