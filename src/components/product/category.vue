@@ -194,8 +194,8 @@ export default {
 
         },
         // 添加分类
-        async addCate(){
-            this.$refs.addCateFormRef.validate((valid) => {
+        addCate(){
+            this.$refs.addCateFormRef.validate(async (valid) => {
                 if (!valid) {
                     return this.$message.error('表单验证失败！')
                 }
@@ -208,8 +208,8 @@ export default {
                 this.addCateDialogVisible = false
             })
         },
-        async modifyCate(){
-            this.$refs.modifyCateFormRef.validate((valid) =>{
+        modifyCate(){
+            this.$refs.modifyCateFormRef.validate(async (valid) =>{
                 if (!valid) {
                     return this.$message.error('表单验证失败！')
                 }
